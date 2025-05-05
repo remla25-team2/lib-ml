@@ -1,0 +1,19 @@
+# Virtual environment
+.venv/
+
+# Artefacts
+dist/
+build/
+*.egg-info/
+
+# Cache
+__pycache__/
+.pytest_cache/
+
+# Folders
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
