@@ -8,8 +8,19 @@ from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 
+import nltk, ssl
+try:
+    _ = stopwords.words("english")
+except LookupError:
+    try:
+        ssl._create_default_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    nltk.download("stopwords", quiet=True)
+
+
 _ps = PorterStemmer()
-_stopwords = set(stopwords.words("english")) - {"not"}  # keep negation word
+_stopwords = set(stopwords.words("english")) - {"not"}
 
 _html_pat = re.compile(r"<[^>]+>")
 _non_letters_pat = re.compile(r"[^a-zA-Z]")
