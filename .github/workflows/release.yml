@@ -2,20 +2,21 @@ name: Release lib-ml
 
 on:
   push:
-    tags: ["v*.*.*"]
+    tags: ["v*.*.*"]  # Trigger only on version tags, like v0.0.1
 
 jobs:
   build-test-publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
+        with:
+          python-version: "3.11"
 
       - name: Install deps & NLTK data
         run: |
@@ -30,6 +31,9 @@ jobs:
           nltk.download("stopwords", quiet=True)
           PY
 
+      - name: Run tests
+        run: pytest -q
+
       - name: Build distribution files
         run: python -m build
 
@@ -37,3 +41,12 @@ jobs:
         with:
           name: lib-ml-dist
           path: dist/*
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
