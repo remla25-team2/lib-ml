@@ -45,17 +45,27 @@ jobs:
       - name: Build distribution files
         run: python -m build
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: lib-ml-dist
-          path: dist/*
+      - name: Get package version
+        id: get_version
+        run: |
+          VERSION=$(lib-version version current)
+          echo "package_version=$VERSION" >> "$GITHUB_OUTPUT" # Export as step output
+          echo "Package version that was built: $VERSION"
 
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
         with:
-          files: |
-            dist/*.whl
-            dist/*.tar.gz
+          name: lib-ml-dist # Name of the artifact to create
+          path: dist/* # Path to the built files
+
+  
+      - name: Upload to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+          tag_name: v${{ steps.get_version.outputs.package_version }}
+          name: Release ${{ steps.get_version.outputs.package_version }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -79,14 +89,19 @@ jobs:
           PRE_VERSION="${NEXT_VERSION}-pre-${{ env.timestamp }}"
           echo "pre_version=$PRE_VERSION" >> $GITHUB_OUTPUT
 
-      # Create Pre-release for builds from main or after tags
+      # Build package for pre-release
+      - name: Build package for pre-release
+        run: |
+          lib-version build --dev
+          # List the built packages
+          ls -la dist/
+          
+      # Create pre-release for all builds
       - name: Create Pre-release
         if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
           files: dist/*
           prerelease: true
           tag_name: v${{ steps.pre_version.outputs.pre_version }}
-          name: Pre-release ${{ steps.pre_version.outputs.pre_version }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: Pre-release ${{ steps.pre_version.outputs.next_version }}
