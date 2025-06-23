@@ -18,5 +18,3 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest", "ruff"]
 
-[tool.setuptools.dynamic]
-version = {attr = "lib_ml.__version__"}
