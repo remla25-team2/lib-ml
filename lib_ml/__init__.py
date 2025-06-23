@@ -4,7 +4,7 @@ sentiment-analysis.
 """
 
 from .preprocessing import TextPreprocessor
-from lib_version.version_util import VersionUtil
 
-__version__ = VersionUtil.get_version()
 __all__ = ["TextPreprocessor"]
+
+__version__ = "0.0.1"
