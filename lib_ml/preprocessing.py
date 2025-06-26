@@ -69,6 +69,6 @@ class TextPreprocessor:
 
     @classmethod
     def load(cls, path: str) -> "TextPreprocessor":
-        obj = cls.__new__(cls)
+        obj = cls()
         obj._vectorizer = joblib.load(path)
         return obj
