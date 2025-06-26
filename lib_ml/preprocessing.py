@@ -59,3 +59,6 @@ class TextPreprocessor:
         obj = cls.__new__(cls)
         obj._vectorizer = joblib.load(path)
         return obj
+    
+    def get_feature_names(self):
+        return self._vectorizer.get_feature_names()
